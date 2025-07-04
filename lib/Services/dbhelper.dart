@@ -25,17 +25,23 @@ class Dbhelper {
   }
 
   Future<Database> initDB() async{
-    Directory path = await getApplicationDocumentsDirectory();
-    final joins = join(path.path,'notes.db');
+    Directory directory = await getApplicationDocumentsDirectory();
+    final path = join(directory.path,'notes.db');
 
-    return openDatabase('''
+    return await openDatabase(
+      path,
+      version: 1,
+      onCreate: (db, version) {
+        db.execute('''
             CREATE TABLE $tableName (
-            $idColumn INTEGER PRIMARY KEY,
+            $idColumn INTEGER PRIMARY KEY AUTOINCREMENT,
             $titleColumn TEXT,
             $descriptionColumn TEXT,
             $timeColumn TEXT
             )
         ''');
+      },
+    );
   }
 
   //inserting the data
